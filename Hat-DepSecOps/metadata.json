@@ -1,0 +1,5 @@
+{
+  "name": "SecureFile Encryptor",
+  "description": "A modern, secure, client-side file encryption tool inspired by Hat.sh. Encrypt and decrypt files in your browser using strong cryptography, with support for both password-based and public-key encryption.",
+  "requestFramePermissions": []
+}

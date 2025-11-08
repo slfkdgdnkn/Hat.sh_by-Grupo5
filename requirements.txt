@@ -1,0 +1,96 @@
+# Requisitos para Hat.sh Edición DevSecOps
+# Este archivo contiene todas las herramientas necesarias y pasos para instalar y ejecutar la aplicación en contenedor
+
+## Prerrequisitos
+- Docker (versión 20.10 o superior)
+- Docker Compose (versión 2.0 o superior)
+- Git (para clonar repositorios)
+- Conexión a internet para descargar imágenes
+
+## Pasos de Instalación
+
+### Paso 1: Instalar Docker
+# Para Ubuntu/Debian:
+sudo apt update
+sudo apt install docker.io docker-compose
+sudo systemctl start docker
+sudo systemctl enable docker
+
+# Para CentOS/RHEL:
+sudo yum install docker docker-compose
+sudo systemctl start docker
+sudo systemctl enable docker
+
+# Para macOS (usando Homebrew):
+brew install docker docker-compose
+
+# Para Windows:
+# Descarga e instala Docker Desktop desde https://www.docker.com/products/docker-desktop
+
+### Paso 2: Verificar Instalación
+docker --version
+docker-compose --version
+
+### Paso 3: Descargar la Imagen del Contenedor
+docker pull loizzz/hat.sh-by_loizzz:latest
+
+### Paso 4: Ejecutar el Contenedor
+# Comando simple de ejecución:
+docker run -d --name hatsh-devsecops -p 8080:80 loizzz/hat.sh-by_loizzz:latest
+
+# O usando Docker Compose (crear docker-compose.yml):
+version: '3.8'
+services:
+  hatsh:
+    image: loizzz/hat.sh-by_loizzz:latest
+    ports:
+      - "8080:80"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run
+      - /var/cache/nginx
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+# Luego ejecutar:
+docker-compose up -d
+
+### Paso 5: Acceder a la Aplicación
+# Abrir navegador y ir a: http://localhost:8080
+
+### Paso 6: Verificar Funcionalidad
+# Revisar logs del contenedor:
+docker logs hatsh-devsecops
+
+# Revisar estado del contenedor:
+docker ps
+
+## Características de Seguridad Incluidas
+- Ejecución con usuario no root
+- Sistema de archivos de solo lectura
+- Opciones de seguridad habilitadas
+- Verificaciones de salud configuradas
+- Superficie de ataque mínima
+
+## Solución de Problemas
+# Si el puerto 8080 está en uso, cambiar a otro puerto:
+docker run -d --name hatsh-devsecops -p 8081:80 loizzz/hat.sh-by_loizzz:latest
+
+# Para detener y eliminar contenedor:
+docker stop hatsh-devsecops
+docker rm hatsh-devsecops
+
+# Para actualizar a la versión más reciente:
+docker pull loizzz/hat.sh-by_loizzz:latest
+docker-compose down
+docker-compose up -d
